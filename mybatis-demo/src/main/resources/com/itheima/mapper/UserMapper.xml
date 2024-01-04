@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+ namespace:
+ result type: 对应的对象
+ id: sql statement 的唯一标识
+-->
+<mapper namespace="com.itheima.mapper.UserMapper">
+    <select id="selectAll" resultType="user">
+        select * from tb_user;
+    </select>
+
+    <!--
+         参数占位符（参数传递的时候使用）
+         1. #{} 等于是将 ？替换为占位符中的元素 防止sql注入
+         2. ${}类似于 id=1 拼sql语句，存在sql注入问题
+         3. sql语句特殊类型处理 比如< >
+          1. 转义字符： < &lt; ..
+          2. CData区 <![CDATA[<]]> #{id}
+        -->
+    <select id="selectById" resultType="user">
+        select * from tb_user where id = #{id};
+    </select>
+</mapper>

@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.itheima.mapper.BrandMapper">
+
+        <!--sql statement-->
+
+        <!--数据库表名称和实体类字段名称不一样，则不能自动封装数据
+            1. 解决方法 在sql语句 - 取别名
+            2. resultMap
+        -->
+<!--
+        1. id 唯一标识
+        2. type:映射类型
+        3. id primary key 的映射
+        4. result 一般字段的映射类型 column ：表的列名 property：实体类属性名
+-->
+        <resultMap id="brandResultMap" type="brand">
+                <!--mapper-->
+                <result column="brand_name" property="brandName"/>
+                <result column="company_name" property="companyName"/>
+        </resultMap>
+
+
+        <select id="selectAll" resultMap="brandResultMap">
+                select * from tb_brand;
+        </select>
+
+        <select id="selectById" resultMap="brandResultMap">
+                select *
+                from tb_brand
+                where id = #{id};
+        </select>
+        
+        <select id="selectByConditions" resultMap="brandResultMap">
+                select *
+                from tb_brand
+                <where>
+                <if test="status!=null">
+                        status = #{status}
+                </if>
+                <if test="companyName!=null and companyName!=''">
+                        and company_name like #{companyName}
+                </if>
+                <if test="brandName!=null and brandName!=''">
+                        and brand_name like #{brandName}
+                </if>
+                </where>
+
+        </select>
+
+        <select id="selectBySingleCondition" resultMap="brandResultMap">
+           select *
+                from tb_brand
+<!--                where 防止无条件报错用where标签-->
+                <where>
+                <choose>
+                        <when test="status!=null">
+                                status = #{status}
+                        </when>
+                        <when test="companyName!=null and companyName!=''">
+                                and company_name like #{companyName}
+                        </when>
+                        <when test="brandName!=null and brandName!=''">
+                                and brand_name like #{brandName}
+                        </when>
+                </choose>
+                </where>
+        </select>
+
+         <!--add brand
+            1. useGeneratedKeys   这两个数据关联对象id
+            2. keyProperty
+         -->
+        <insert id="add" useGeneratedKeys="true" keyProperty="id">
+                insert into tb_brand(brand_name,company_name,ordered,description,status)
+                values(#{brandName},#{companyName},#{ordered},#{description},#{status});
+        </insert>
+        <!--update brand-->
+        <update id="update">
+                update tb_brand
+                <set>
+                <if test="brandName!=null and brandName!=''">
+                        brand_name =#{brandName},
+                </if>
+                <if test="companyName!=null and companyName!=''">
+                        company_name =#{companyName},
+                </if>
+                <if test="ordered!=null">
+                        ordered = #{ordered},
+                </if>
+                <if test="description!=null and description!=''">
+                        brand_name =#{brandName},
+                </if>
+                <if test="status!=null">
+                        status = #{status},
+                </if>
+                </set>
+                where id =#{id};
+        </update>
+
+         <!--delete by id-->
+        <delete id="deleteById">
+                delete from tb_brand where id =#{id}
+        </delete>
+        <!--delete by ids
+              使用params 注解map集合默认key的注解
+         -->
+        <delete id="deleteByIds">
+                delete from tb_brand where id
+                in
+                <foreach collection="ids" item ='id'
+                separator="," open="(" close=")">
+                   #{id}
+                </foreach>
+                ;
+        </delete>
+</mapper>
